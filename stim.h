@@ -116,15 +116,12 @@ void read_and_send_adc_value(uint8_t channel){
     switch(channel){ // Select ADPCH
         case CHAN_ACC_X:
             ADPCH = CHAN_ACC_X_ADC;
-            //data[0] = CHAN_ACC_X;
             break;
         case CHAN_ACC_Y:
             ADPCH = CHAN_ACC_Y_ADC;
-            //data[0] = CHAN_ACC_Y;
             break;
         case CHAN_POTEN:
             ADPCH = CHAN_POTEN_ADC;
-            //data[0] = CHAN_POTEN;
             break;
         default:
             send_stim_response(0,0,0);

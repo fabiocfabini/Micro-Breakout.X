@@ -2,11 +2,16 @@ from typing import Tuple, List
 import serial
 
 class NCap:
-    X_CHANN: bytes = b'\x00'
-    Y_CHANN: bytes = b'\x01'
-    S_CHANN: bytes = b'\x02'
-    LED6_CHANN: bytes = b'\x03'
-    LED7_CHANN: bytes = b'\x04'
+    Y_CHANN:     bytes = b'\x00'
+    BTN_A_CHANN: bytes = b'\x01'
+    BTN_B_CHANN: bytes = b'\x02'
+    BTN_C_CHANN: bytes = b'\x03'
+    BTN_D_CHANN: bytes = b'\x04'
+    LED_5_CHANN:  bytes = b'\x05'
+    LED_6_CHANN:  bytes = b'\x06'
+    LED_7_CHANN:  bytes = b'\x07'
+
+    channels = [Y_CHANN, BTN_A_CHANN, BTN_B_CHANN, BTN_C_CHANN, BTN_D_CHANN, LED_5_CHANN, LED_6_CHANN, LED_7_CHANN]
 
     def __init__(self, port: str, baud_rate: int = 9600):
         self.conn = serial.Serial(port, baud_rate)
@@ -42,3 +47,8 @@ class NCap:
 
         # Return the response code and the response
         return res_code, res
+
+if __name__ == "__main__":
+    ncap = NCap('/dev/ttyACM1', baud_rate=115200)
+
+    ncap.read_tc(b'\x00', debug=True)

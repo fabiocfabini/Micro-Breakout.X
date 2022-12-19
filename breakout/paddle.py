@@ -7,11 +7,11 @@ class Paddle(pygame.sprite.Sprite):
     x_rest = 128
     y_rest = 127
     # [-123, -82, -41, 0, 41, 82, 123]
-    x_velocities = np.array([-3, -2, -1, 0, 1, 2, 3])*2
+    x_velocities = np.array([-3, -2, -1, 0, 1, 2, 3])*4
     x_ranges = [
-        range(-130,-82), range(-82, -41), range(-41, 0),    # Move left
-        range(0, 1),                                        # Don't move
-        range(1, 41), range(41, 82), range(82, 130)         # Move right
+        range(-130,-82), range(-82, -41), range(-41, -10),    # Move left
+        range(-10, 11),                                        # Don't move
+        range(11, 41), range(41, 82), range(82, 130)         # Move right
     ]
 
 
@@ -39,5 +39,5 @@ class Paddle(pygame.sprite.Sprite):
     def _check_bounds(self):
         if self.rect.x < 0:
             self.rect.x = 0
-        elif self.rect.x > 700:
-            self.rect.x = 700
+        elif self.rect.x > WIDTH - self.rect.width:
+            self.rect.x = WIDTH - self.rect.width

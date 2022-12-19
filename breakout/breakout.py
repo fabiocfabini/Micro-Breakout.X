@@ -17,18 +17,15 @@ fig1.suptitle('Sensors data', fontsize=20)
 ax1 = fig1.add_subplot(111)
 ax1.set_xlabel('x label')
 
-N = 500
 val_x = []
 val_y = []
 val_s = []
 
 pygame.init()
-ncap = NCap('/dev/ttyACM2', baud_rate=115200)
-
-WIDTH, HEIGHT = 800, 600
+ncap = NCap('/dev/ttyACM1', baud_rate=115200)
 
 score = 0
-lives = 3
+lives = 5
 size = (WIDTH, HEIGHT)
 
 screen = pygame.display.set_mode(size)
@@ -78,27 +75,21 @@ carryOn = True
 clock = pygame.time.Clock()
 start = time.time()
 iterations = 0
-# -------- Main Program Loop -----------
 while carryOn:
-    # ------- Read data from the sensor
-    res_code_x, res_x = ncap.read_value(ncap.X_CHANN)
+    res_code_x, res_x = ncap.read_value(ncap.Y_CHANN)
     if res_code_x != 0:
         val_x.append(res_x[0])
     else:
-        raise Exception("Error: Could not read X channel")
+        raise Exception("Error: Could not read Y channel")
 
-    # --- Main event loop
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             carryOn = False # Flag that we are done so we exit this loop
 
-    # --- Move Paddle
     paddle.move(val_x[-1])
 
-    # --- Game logic should go here
     all_sprites_list.update()
 
-    #Check if the ball is bouncing against any of the 4 walls:
     if ball.rect.x>=790:
         ball.vel_x = -ball.vel_x
     if ball.rect.x<=0:
@@ -107,65 +98,55 @@ while carryOn:
         ball.vel_y = -ball.vel_y
         lives -= 1
         if lives == 0:
-            #Display Game Over Message for 3 seconds
             font = pygame.font.Font(None, 74)
             text = font.render("GAME OVER", 1, WHITE)
             screen.blit(text, (250,300))
             pygame.display.flip()
             pygame.time.wait(3000)
 
-            #Stop the Game
             carryOn=False
 
+    # Detect collisions between the ball and the top of the screen
     if ball.rect.y<40:
         ball.vel_y = -ball.vel_y
 
-    #Detect collisions between the ball and the paddles
+    # Detect collisions between the ball and the paddles
     if pygame.sprite.collide_mask(ball, paddle):
         ball.rect.x -= ball.vel_x
         ball.rect.y -= ball.vel_y
         ball.bounce()
 
-    #Check if there is the ball collides with any of bricks
+    # Check if there is the ball collides with any of bricks
     brick_collision_list = pygame.sprite.spritecollide(ball,all_bricks,False)
     for brick in brick_collision_list:
         ball.bounce()
         score += 1
         brick.kill()
         if len(all_bricks)==0:
-            #Display Level Complete Message for 3 seconds
             font = pygame.font.Font(None, 74)
-            text = font.render("LEVEL COMPLETE", 1, WHITE)
+            text = font.render("CONGRATULATIONS, YOU WIN!", 1, WHITE)
             screen.blit(text, (200,300))
             pygame.display.flip()
             pygame.time.wait(3000)
 
-            #Stop the Game
             carryOn=False
 
-    # --- Drawing code should go here
-    # First, clear the screen to dark blue.
     screen.fill(DARKBLUE)
     pygame.draw.line(screen, WHITE, [0, 38], [800, 38], 2)
 
-    #Display the score and the number of lives at the top of the screen
     font = pygame.font.Font(None, 34)
     text = font.render("Score: " + str(score), 1, WHITE)
     screen.blit(text, (20,10))
     text = font.render("Lives: " + str(lives), 1, WHITE)
     screen.blit(text, (650,10))
 
-    #Now let's draw all the sprites in one go. (For now we only have 2 sprites!)
     all_sprites_list.draw(screen)
 
-    # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
 
-    # --- Limit to 60 frames per second
     clock.tick(60)
 
     iterations += 1
-#Once we have exited the main program loop we can stop the game engine:
 pygame.quit()
 
 print("Time taken: ", time.time() - start)

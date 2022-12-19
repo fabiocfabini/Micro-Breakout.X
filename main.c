@@ -8,8 +8,6 @@
 #define STIM_IMPLEMENTATION
 #include "stim.h"
 
-
-//declaration of global variables and functions
 void config(void);
 uint8_t getch(void);
 uint8_t echo_rec_bytes(void);
@@ -45,7 +43,6 @@ uint8_t getch(void){
 
 uint8_t echo_single_byte(void) {
     putch(getch());
-    putch(10);
     return 0;
 }
 

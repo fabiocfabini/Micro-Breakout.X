@@ -90,9 +90,7 @@ void send_stim_response(uint8_t res_code, uint8_t length_msb, uint8_t length_lsb
 
 #ifdef STIM_IMPLEMENTATION
 
-#define CHAN_POTEN_ADC 0 // RA0
-#define CHAN_ACC_X_ADC 8 // RB0
-#define CHAN_ACC_Y_ADC 9 // RB1
+#define CHAN_ACC_Y_ADC 8 // RB0
 
 static NCAP_cmd cmd;
 DataBuffer data;
@@ -114,14 +112,8 @@ void read_ncap_cmd(){
 
 void read_and_send_adc_value(uint8_t channel){
     switch(channel){ // Select ADPCH
-        case CHAN_ACC_X:
-            ADPCH = CHAN_ACC_X_ADC;
-            break;
         case CHAN_ACC_Y:
             ADPCH = CHAN_ACC_Y_ADC;
-            break;
-        case CHAN_POTEN:
-            ADPCH = CHAN_POTEN_ADC;
             break;
         default:
             send_stim_response(0,0,0);
@@ -143,12 +135,32 @@ void read_and_send_adc_value(uint8_t channel){
 
 void read_from_led(uint8_t channel){
     switch(channel){
+        case CHAN_LED_RA5:
+            data[0] = PORTAbits.RA5;
+            send_stim_response(1,0,1);
+            return;
         case CHAN_LED_RA6:
-            data[0] = PORTAbits.RA6; // Read directly from RA port
+            data[0] = PORTAbits.RA6;
             send_stim_response(1,0,1);
             return;
         case CHAN_LED_RA7:
             data[0] = PORTAbits.RA7;
+            send_stim_response(1,0,1);
+            return;
+        case CHAN_BTN_A:
+            data[0] = PORTBbits.RB4;
+            send_stim_response(1,0,1);
+            return;
+        case CHAN_BTN_B:
+            data[0] = PORTBbits.RB5;
+            send_stim_response(1,0,1);
+            return;
+        case CHAN_BTN_C:
+            data[0] = PORTBbits.RB6;
+            send_stim_response(1,0,1);
+            return;
+        case CHAN_BTN_D:
+            data[0] = PORTBbits.RB7;
             send_stim_response(1,0,1);
             return;
         default:
@@ -159,11 +171,15 @@ void read_from_led(uint8_t channel){
 
 void write_to_led(uint8_t channel, bool value){
     switch(channel){
-        case 3:
+        case CHAN_LED_RA5:
+            LATAbits.LATA5 = value; // Writing to LATAx. It then will write to RAx
+            send_stim_response(1,0,0);
+            return;
+        case CHAN_LED_RA6:
             LATAbits.LATA6 = value; // Writing to LATAx. It then will write to RAx
             send_stim_response(1,0,0);
             return;
-        case 4:
+        case CHAN_LED_RA7:
             LATAbits.LATA7 = value;
             send_stim_response(1,0,0);
             return;
@@ -185,14 +201,23 @@ void interpret_ncap_cmd(){
                             return;
                         case TRANSDUCER_TEDS_ID:
                             switch(cmd.dtcn_lsb){
-                                case CHAN_ACC_X:
-                                    send_tc_teds(CHAN_ACC_X);
-                                    return;
                                 case CHAN_ACC_Y:
                                     send_tc_teds(CHAN_ACC_Y);
                                     return;
-                                case CHAN_POTEN:
-                                    send_tc_teds(CHAN_POTEN);
+                                case CHAN_BTN_A:
+                                    send_tc_teds(CHAN_BTN_A);
+                                    return;
+                                case CHAN_BTN_B:
+                                    send_tc_teds(CHAN_BTN_B);
+                                    return;
+                                case CHAN_BTN_C:
+                                    send_tc_teds(CHAN_BTN_C);
+                                    return;
+                                case CHAN_BTN_D:
+                                    send_tc_teds(CHAN_BTN_D);
+                                    return;
+                                case CHAN_LED_RA5:
+                                    send_tc_teds(CHAN_LED_RA5);
                                     return;
                                 case CHAN_LED_RA6:
                                     send_tc_teds(CHAN_LED_RA6);
@@ -209,24 +234,30 @@ void interpret_ncap_cmd(){
                             send_stim_response(0,0,0);
                             return;
                     }
-                    return;
+                    // return;
                 default:
                     send_stim_response(0,0,0);
                     return;
             }
-            return;
+            // return;
         case XDCR_OPERATE:
             switch (cmd.func){
                 case READ_TC_SEG:
                     switch (cmd.dtcn_lsb){
-                        case CHAN_ACC_X:
-                            read_and_send_adc_value(CHAN_ACC_X);
-                            return;
                         case CHAN_ACC_Y:
                             read_and_send_adc_value(CHAN_ACC_Y);
                             return;
-                        case CHAN_POTEN:
-                            read_and_send_adc_value(CHAN_POTEN);
+                        case CHAN_BTN_A:
+                            read_from_led(CHAN_BTN_A);
+                            return;
+                        case CHAN_BTN_B:
+                            read_from_led(CHAN_BTN_B);
+                            return;
+                        case CHAN_BTN_C:
+                            read_from_led(CHAN_BTN_C);
+                            return;
+                        case CHAN_BTN_D:
+                            read_from_led(CHAN_BTN_D);
                             return;
                         case CHAN_LED_RA6:
                             read_from_led(CHAN_LED_RA6);
@@ -238,27 +269,28 @@ void interpret_ncap_cmd(){
                             send_stim_response(0,0,0);
                             return;
                     }
-                    return;
+                    // return;
                 case WRITE_TC_SEG:
                     switch (cmd.dtcn_lsb){
+                        case CHAN_LED_RA5:
+                            write_to_led(CHAN_LED_RA5, (bool) data[1]);
+                            return;
                         case CHAN_LED_RA6:
-                            // write to Led 5
-                            write_to_led(cmd.dtcn_lsb, (bool) data[1]);
+                            write_to_led(CHAN_LED_RA6, (bool) data[1]);
                             return;
                         case CHAN_LED_RA7:
-                            // write to Led 5
-                            write_to_led(cmd.dtcn_lsb, (bool) data[1]);
+                            write_to_led(CHAN_LED_RA7, (bool) data[1]);
                             return;
                         default:
                             send_stim_response(0,0,0);
                             return;
                     }
-                    return;
+                    // return;
                 default:
                     send_stim_response(0,0,0);
                     return;
             }
-            return;
+            // return;
         default:
             send_stim_response(0,0,0);
             return;
@@ -266,7 +298,7 @@ void interpret_ncap_cmd(){
 }
 
 void send_stim_response(uint8_t res_code, uint8_t length_msb, uint8_t length_lsb){
-    putch(res_code); // error code
+    putch(res_code);   // error code
     putch(length_msb); // length msb
     putch(length_lsb); // length lsb
     

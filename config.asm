@@ -19,11 +19,11 @@ _config:
     CLRF LATA,1 ; Set all LatchA bits to zero
     
     BANKSEL TRISA
-    MOVLW 0b00000001 
+    MOVLW 0b00000000 
     MOVWF TRISA,1 ; 0=out, 1=in. RA0 is input.
     
     BANKSEL ANSELA
-    MOVLW 0b00000001
+    MOVLW 0b00000000
     MOVWF ANSELA,1 ; 0=digital;1=in. RA0 to potenciometer.
     
     
@@ -34,11 +34,11 @@ _config:
     CLRF LATB,1 ; Set all LatchB bits to zero
     
     BANKSEL LATB
-    MOVLW 0b00000111 
+    MOVLW 0b11110001 
     MOVWF LATB,1 ; 0=out, 1=in. RB0, RB1, RB2 are input.
     
     BANKSEL ANSELB
-    MOVLW 0b00000111
+    MOVLW 0b00000001
     MOVWF ANSELB,1 ; 0=digital;1=in. RB0, RB1, RB2 are analog.
     
     

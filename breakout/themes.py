@@ -1,3 +1,7 @@
+"""
+Define the colors used in the game.
+"""
+
 WHITE       = (255,255,255)
 BLACK       = (0,0,0)
 DARKBLUE    = (36,90,190)

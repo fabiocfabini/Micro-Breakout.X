@@ -3,6 +3,10 @@ import pygame
 from themes import *
 
 class Brick(pygame.sprite.Sprite):
+    """
+    This class represents the bar at the bottom that the player
+    controls. It derives from the "Sprite" class in Pygame.
+    """
     def __init__(self, color, width, height):
         super().__init__()
 

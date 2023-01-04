@@ -12,11 +12,11 @@
 * PUTCH & GETCH *
 *****************/
 
-void putch(uint8_t byte);
-uint8_t getch(void);
+extern void putch(uint8_t byte);
+extern uint8_t getch(void);
 
 #define TEDS_IMPLEMENTATION
-#include "teds.h"
+#include "teds.h"           // Include the teds header with implementations
 
 // Classes & functions
 #define COMMON_CMD   1
@@ -25,7 +25,7 @@ uint8_t getch(void);
     #define READ_TC_SEG 1
     #define WRITE_TC_SEG 2
 
-#define DATABUFFER_CAP 255
+#define DATABUFFER_CAP 255  
 typedef uint8_t DataBuffer[DATABUFFER_CAP];
 typedef struct {
     uint8_t dtcn_msb;
@@ -43,12 +43,6 @@ typedef struct {
     uint8_t length_msb;
     uint8_t length_lsb;
 } STIM_cmd;
-typedef struct {
-    uint8_t res_code;
-    uint8_t length_msb;
-    uint8_t length_lsb;
-} STIM_res;
-
 
 /*
  * @brief This function reads from, the serial port, the bytes associateed with a ncap command and stores them in a global ncap command struct.
@@ -66,7 +60,7 @@ void read_and_send_adc_value(uint8_t channel);
  * @brief This function reads the current value of a LED.
  * @param channel The channel from where to read the LEAD.
 */
-void read_from_led(uint8_t channel);
+void read_from_channel(uint8_t channel);
 
 /*
  * @brief This function writes a given value to a LED.
@@ -93,8 +87,7 @@ void send_stim_response(uint8_t res_code, uint8_t length_msb, uint8_t length_lsb
 #define CHAN_ACC_Y_ADC 8 // RB0
 
 static NCAP_cmd cmd;
-DataBuffer data;
-uint8_t adc_result, RESULT_READY;
+static DataBuffer data;
 
 void read_ncap_cmd(){
     cmd.dtcn_msb = getch();
@@ -103,7 +96,7 @@ void read_ncap_cmd(){
     cmd.func = getch();
     cmd.length_msb = getch();
     cmd.length_lsb = getch();
-    for(uint8_t i = 0; i < cmd.length_lsb + cmd.length_msb*2; i++){
+    for(uint8_t i = 0; i < cmd.length_lsb + (cmd.length_msb << 8); i++){
         data[i] = getch();
     }
     
@@ -133,8 +126,12 @@ void read_and_send_adc_value(uint8_t channel){
     return;
 }
 
-void read_from_led(uint8_t channel){
+void read_from_channel(uint8_t channel){
     switch(channel){
+        case CHAN_LED_RA4:
+            data[0] = PORTAbits.RA4;
+            send_stim_response(1,0,1);
+            return;
         case CHAN_LED_RA5:
             data[0] = PORTAbits.RA5;
             send_stim_response(1,0,1);
@@ -171,6 +168,10 @@ void read_from_led(uint8_t channel){
 
 void write_to_led(uint8_t channel, bool value){
     switch(channel){
+        case CHAN_LED_RA4:
+            LATAbits.LATA4 = value; // Writing to LATAx. It then will write to RAx
+            send_stim_response(1,0,0);
+            return;
         case CHAN_LED_RA5:
             LATAbits.LATA5 = value; // Writing to LATAx. It then will write to RAx
             send_stim_response(1,0,0);
@@ -248,22 +249,28 @@ void interpret_ncap_cmd(){
                             read_and_send_adc_value(CHAN_ACC_Y);
                             return;
                         case CHAN_BTN_A:
-                            read_from_led(CHAN_BTN_A);
+                            read_from_channel(CHAN_BTN_A);
                             return;
                         case CHAN_BTN_B:
-                            read_from_led(CHAN_BTN_B);
+                            read_from_channel(CHAN_BTN_B);
                             return;
                         case CHAN_BTN_C:
-                            read_from_led(CHAN_BTN_C);
+                            read_from_channel(CHAN_BTN_C);
                             return;
                         case CHAN_BTN_D:
-                            read_from_led(CHAN_BTN_D);
+                            read_from_channel(CHAN_BTN_D);
+                            return;
+                        case CHAN_LED_RA4:
+                            read_from_channel(CHAN_LED_RA4);
+                            return;
+                        case CHAN_LED_RA5:
+                            read_from_channel(CHAN_LED_RA5);
                             return;
                         case CHAN_LED_RA6:
-                            read_from_led(CHAN_LED_RA6);
+                            read_from_channel(CHAN_LED_RA6);
                             return;
                         case CHAN_LED_RA7:
-                            read_from_led(CHAN_LED_RA7);
+                            read_from_channel(CHAN_LED_RA7);
                             return;
                         default:
                             send_stim_response(0,0,0);
@@ -272,6 +279,9 @@ void interpret_ncap_cmd(){
                     // return;
                 case WRITE_TC_SEG:
                     switch (cmd.dtcn_lsb){
+                        case CHAN_LED_RA4:
+                            write_to_led(CHAN_LED_RA4, (bool) data[1]);
+                            return;
                         case CHAN_LED_RA5:
                             write_to_led(CHAN_LED_RA5, (bool) data[1]);
                             return;
@@ -302,7 +312,7 @@ void send_stim_response(uint8_t res_code, uint8_t length_msb, uint8_t length_lsb
     putch(length_msb); // length msb
     putch(length_lsb); // length lsb
     
-    for(uint8_t i = 0; i < length_lsb; i++){
+    for(uint8_t i = 0; i < length_lsb + (length_msb << 8); i++){
         putch(data[i]);
     }
     

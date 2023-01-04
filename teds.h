@@ -79,7 +79,7 @@ void send_TLV(TLV *tlv);
 
 static META_TEDS meta_teds;
 
-#define NUM_TCT 8
+#define NUM_TCT 9
 static TC_TEDS tcts[NUM_TCT];
 
 void init_meta_teds(){
@@ -195,8 +195,8 @@ void init_tc_teds(){
 
     memcpy(tcts[4].data_model_sb, data_model_sb_info, TCT_DATA_SB_L);
 
-    /* Channel 5- Led on Pin RA5 - Actuator */
-    #define CHAN_LED_RA5 5
+    /* Channel 5- Led on Pin RA4 - Actuator */
+    #define CHAN_LED_RA4 5
     memcpy(tcts[5].id, id_info, TCT_ID_L);
     
     TLV type_info_3[TCT_TYPE_L] = {11, 1, 1};
@@ -214,8 +214,8 @@ void init_tc_teds(){
 
     memcpy(tcts[5].data_model_sb, data_model_sb_info, TCT_DATA_SB_L);
     
-    /* Channel 6 - Led on Pin RA6 - Actuator */
-    #define CHAN_LED_RA6 6
+    /* Channel 6 - Led on Pin RA5 - Actuator */
+    #define CHAN_LED_RA5 6
     memcpy(tcts[6].id, id_info, TCT_ID_L);
     
     memcpy(tcts[6].type, type_info_3, TCT_TYPE_L);
@@ -232,8 +232,8 @@ void init_tc_teds(){
 
     memcpy(tcts[6].data_model_sb, data_model_sb_info, TCT_DATA_SB_L);
     
-    /* Channel 7 - Led on Pin RA7 - Actuator */
-    #define CHAN_LED_RA7 7
+    /* Channel 7 - Led on Pin RA6 - Actuator */
+    #define CHAN_LED_RA6 7
     memcpy(tcts[7].id, id_info, TCT_ID_L);
 
     memcpy(tcts[7].type, type_info_3, TCT_TYPE_L);
@@ -249,6 +249,24 @@ void init_tc_teds(){
     memcpy(tcts[7].data_model_length, data_model_length_info, TCT_DATA_LENGTH_L);
 
     memcpy(tcts[7].data_model_sb, data_model_sb_info, TCT_DATA_SB_L);
+    
+    /* Channel 8 - Led on Pin RA7 - Actuator */
+    #define CHAN_LED_RA7 8
+    memcpy(tcts[8].id, id_info, TCT_ID_L);
+
+    memcpy(tcts[8].type, type_info_3, TCT_TYPE_L);
+
+    memcpy(tcts[8].units, units_info, TCT_UNIT_L); //TODO: Does it measure m/s^2? Or Volts?
+
+    memcpy(tcts[8].low_range_limit, low_range_limit_info, TCT_LOW_RANGE_LIMIT_L);
+
+    memcpy(tcts[8].high_range_limit, high_range_limit_info, TCT_HIGH_RANGE_LIMIT_L);
+
+    memcpy(tcts[8].data_model, data_model_info, TCT_DATA_MODEL_L);
+
+    memcpy(tcts[8].data_model_length, data_model_length_info, TCT_DATA_LENGTH_L);
+
+    memcpy(tcts[8].data_model_sb, data_model_sb_info, TCT_DATA_SB_L);
 }
 
 #ifdef TEDS_DEBUG

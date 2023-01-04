@@ -5,7 +5,7 @@ GLOBAL _int_handler, _interpret_ncap_cmd, _read_ncap_cmd, _echo_rec_bytes, _echo
     
 PSECT intcode
 
-_int_handler:    ;when an interrupt happens, this function is called. It is your job to verify what interrupt happened and act accordingly
+_int_handler:
     BANKSEL PIR3
     BTFSC PIR3, 5   ;check if the EUSART1 RX flag is set. If so, go to the C interpret_ncap_cmd. If not, skip.  
     call _interpret_ncap_cmd

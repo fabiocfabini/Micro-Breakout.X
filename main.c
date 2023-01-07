@@ -37,6 +37,7 @@ void putch(uint8_t byte)
 }
 
 uint8_t getch(void){
+    RC1STAbits.OERR = 0;    // Would like to test this
     while(!PIR3bits.RC1IF);
     return RC1REG;
 }

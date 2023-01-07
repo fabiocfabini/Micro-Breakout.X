@@ -33,9 +33,9 @@ _config:
     BANKSEL LATB
     CLRF LATB,1 ; Set all LatchB bits to zero
     
-    BANKSEL LATB
+    BANKSEL TRISB
     MOVLW 0b11110001 
-    MOVWF LATB,1 ; Define RB[0,4,5,6,7] as input
+    MOVWF TRISB,1 ; Define RB[0,4,5,6,7] as input
     
     BANKSEL ANSELB
     MOVLW 0b00000001
@@ -83,7 +83,7 @@ _config:
     ;===============
     ;CONFIGURE USART
     ;===============
-    ;BR=9600 @ CLK=32 MHz    
+    ;BR=19200 @ CLK=32 MHz    
     
     BANKSEL SP1BRGL
     MOVLW 0b00011001 ; Make baudrate 19200 bits/sec
@@ -110,7 +110,7 @@ _config:
     MOVWF ADREF,1
     
     BANKSEL ADCLK // n = 15
-    MOVLW 0b00000011   ; Q: SET THE ADC CLOCK FREQUENCY TO 1 MHZ, KNOWING THAT FOSC = 32 MHZ
+    MOVLW 0b00001111   ; Q: SET THE ADC CLOCK FREQUENCY TO 1 MHZ, KNOWING THAT FOSC = 32 MHZ
     MOVWF ADCLK,1
     
     BANKSEL ADCON0

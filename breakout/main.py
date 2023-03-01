@@ -1,3 +1,4 @@
+import sys
 import time
 
 import pygame
@@ -496,8 +497,15 @@ def run_opts():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python main.py <port> <baudrate>")
+        exit(1)
+
+    port = sys.argv[1]
+    baudrate = int(sys.argv[2])
+
     # Initialize connection to port
-    ncap = NCap('/dev/ttyACM0', baud_rate=19200)
+    ncap = NCap(port, baud_rate=baudrate)
     # Calibrate the sensor
     REST_VALUE = ncap.calibrate()
 
